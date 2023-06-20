@@ -1,9 +1,10 @@
 class User {
+  static final User instance = User();
 
   late String _email;
   late String _password;
 
-    String getEmail() {
+  String getEmail() {
     return _email;
   }
 
@@ -18,5 +19,4 @@ class User {
   void setPassword(password) {
     _password = password;
   }
-  
 }
