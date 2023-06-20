@@ -15,66 +15,95 @@ class CalcPage extends StatefulWidget {
 }
 
 class _CalcPageState extends State<CalcPage> {
+  final _formKey = GlobalKey<FormState>();
   TextEditingController numberOneController = TextEditingController();
   TextEditingController numberTwoController = TextEditingController();
 
-  // String _email = User.instance.getEmail();
   double _soma = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            mainTitle(text: 'Olá, [_email]!'),
-            const SizedBox(
-              height: 50,
-            ),
-            mainTitle(text: "Entre com os valores"),
-            FormTextField(
-              labelText: "Número 1",
-              inputType: TextInputType.number,
-              hintText: "Número 1",
-              textController: numberOneController,
-            ),
-            FormTextField(
-              labelText: "Número 2",
-              hintText: "Número 2",
-              inputType: TextInputType.number,
-              textController: numberTwoController,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      appBar: appBar(),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          mainTitle(
+            text: 'Olá, ${User.instance.getEmail()}',
+          ),
+          const SizedBox(
+            height: 50,
+          ),
+          mainTitle(
+            text: 'Entre com os valores',
+          ),
+          Form(
+            key: _formKey,
+            child: Column(
               children: [
+                FormTextField(
+                  labelText: 'Número 1',
+                  hintText: 'Número 1',
+                  textController: numberOneController,
+                  inputType: TextInputType.text,
+                  inputValidator: (number) {
+                    if (number == null || number.isEmpty) {
+                      return 'O primeiro número precisa ser preenchido!';
+                    }
+
+                    if (double.tryParse(number) is! double) {
+                      return 'O primeiro número precisa ser do tipo número!';
+                    }
+
+                    return null;
+                  },
+                ),
+                FormTextField(
+                  labelText: 'Número 2',
+                  hintText: 'Número 2',
+                  textController: numberTwoController,
+                  inputType: TextInputType.text,
+                  inputValidator: (number) {
+                    if (number == null || number.isEmpty) {
+                      return 'O segundo número precisa ser preenchido!';
+                    }
+
+                    if (double.tryParse(number) is! double) {
+                      return 'O segundo número precisa ser do tipo número!';
+                    }
+
+                    return null;
+                  },
+                ),
                 mainButton(
+                  buttonText: 'Calcular',
                   buttonFunction: () {
-                    setState(() {
+                    if (_formKey.currentState!.validate()) {
                       Soma.instance
                           .setNumero1(double.parse(numberOneController.text));
                       Soma.instance
                           .setNumero2(double.parse(numberTwoController.text));
-                      _soma = SomaController.instance.soma();
-                    });
+
+                      setState(() {
+                        _soma = SomaController.instance.soma();
+                      });
+                    }
                   },
-                  buttonText: "Calcular",
                 ),
               ],
             ),
-            SizedBox(
-              height: 20,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  "Resultado: ${_soma.toStringAsFixed(2)}",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ],
-            ),
-          ],
-        ));
+          ),
+          Row(
+            children: [
+              Text(
+                'Resultado: ${_soma.toStringAsFixed(2)}',
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 }
